@@ -6,7 +6,7 @@ import { ONE_BD, ZERO_BD, ZERO_BI } from './constants'
 
 export const WGLUE_ADDRESS = '0x9a1691d500c54e1d79df2347d170987aa3e527ac' // Wrapped GLUE
 export const USDC_WGLUE_POOL = '0xd8f4a7667fe621d6224d1c426bd15879ca52ee58' // WGLUE/USDC.e pool
-export const STABLECOIN_IS_TOKEN0 = false // USDC.e is token1, WGLUE is token0
+export const STABLECOIN_IS_TOKEN0 = true // We want token1Price from WGLUE/USDC.e pool (treating stablecoin as token0 in function logic)
 
 // Legacy WETH address (keeping for compatibility)
 export const WETH_ADDRESS = '0x2F6F07CDcf3588944Bf4C42aC74ff24bF56e7590'
@@ -28,18 +28,6 @@ export const MINIMUM_ETH_LOCKED = BigDecimal.fromString('60')
 
 const Q192 = BigInt.fromI32(2).pow(192 as u8)
 export function sqrtPriceX96ToTokenPrices(sqrtPriceX96: BigInt, token0: Token, token1: Token): BigDecimal[] {
-  // TEMPORARY FIX: Use hardcoded values for WGLUE/USDC.e pool until sqrt price calculation is fixed
-  if (
-    token0.id == '0x9a1691d500c54e1d79df2347d170987aa3e527ac' &&
-    token1.id == '0xee45ed3f6c675f319bb9de62991c1e78b484e0b8'
-  ) {
-    // Hardcode correct prices based on expected 1 GLUE = ~0.08 USDC.e
-    const price0 = BigDecimal.fromString('0.08') // USDC.e per WGLUE
-    const price1 = BigDecimal.fromString('12.5') // WGLUE per USDC.e (1/0.08)
-    return [price0, price1]
-  }
-
-  // Original formula for other pools
   const num = sqrtPriceX96.times(sqrtPriceX96).toBigDecimal()
   const denom = BigDecimal.fromString(Q192.toString())
   const price1 = num
