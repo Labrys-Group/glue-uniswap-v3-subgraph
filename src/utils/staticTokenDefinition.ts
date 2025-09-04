@@ -40,15 +40,33 @@ export const STATIC_TOKEN_DEFINITIONS: Array<StaticTokenDefinition> = [
     decimals: BigInt.fromI32(6),
   },
   {
+    address: Address.fromString('0x2F6F07CDcf3588944Bf4C42aC74ff24bF56e7590'),
+    name: 'WETH',
+    symbol: 'WETH',
+    decimals: BigInt.fromI32(18),
+  },
+  {
+    address: Address.fromString('0x461Da3759FdB8f0b7b0acA8A0A48A91daAadDf27'),
+    name: 'AOL (America Online)',
+    symbol: 'AOL',
+    decimals: BigInt.fromI32(18),
+  },
+  {
+    address: Address.fromString('0x8F799534708044e27ec8f834EDCA4e90a81A527d'),
+    name: 'Hosico Cat',
+    symbol: 'HOSICO',
+    decimals: BigInt.fromI32(6),
+  },
+  {
     address: Address.fromString('0x258576c5da4502b0fa91823817c2b69c588d7616'),
     name: 'Mister Miggles',
     symbol: 'MIGGLES',
     decimals: BigInt.fromI32(18),
   },
   {
-    address: Address.fromString('0x2F6F07CDcf3588944Bf4C42aC74ff24bF56e7590'),
-    name: 'WETH',
-    symbol: 'WETH',
+    address: Address.fromString('0x33bAC01fdD0648769F5f941C692621D61D6D31b9'),
+    name: 'Toshi',
+    symbol: 'TOSHI',
     decimals: BigInt.fromI32(18),
   },
 ]

@@ -8,14 +8,24 @@ export const WGLUE_ADDRESS = '0x9a1691d500c54e1d79df2347d170987aa3e527ac' // Wra
 export const USDC_WGLUE_POOL = '0xd8f4a7667fe621d6224d1c426bd15879ca52ee58' // WGLUE/USDC.e pool
 export const STABLECOIN_IS_TOKEN0 = true // We want token1Price from WGLUE/USDC.e pool (treating stablecoin as token0 in function logic)
 
-// Legacy WETH address (keeping for compatibility)
+// Bridge WETH address (stargate)
 export const WETH_ADDRESS = '0x2F6F07CDcf3588944Bf4C42aC74ff24bF56e7590'
+
+// TVLs to track
+const AOL = '0x461Da3759FdB8f0b7b0acA8A0A48A91daAadDf27'
+const HOSICO = '0x8F799534708044e27ec8f834EDCA4e90a81A527d'
+const MIGGLES = '0x258576C5dA4502b0fa91823817C2b69c588d7616'
+const TOSHI = '0x33bAC01fdD0648769F5f941C692621D61D6D31b9'
 
 // token where amounts should contribute to tracked volume and liquidity
 // usually tokens that many tokens are paired with s
 export const WHITELIST_TOKENS: string[] = [
   WGLUE_ADDRESS, // WGLUE (native wrapped token)
   WETH_ADDRESS, // WETH (legacy)
+  AOL,
+  HOSICO,
+  MIGGLES,
+  TOSHI,
 ]
 
 // WGLUE/USDC.e pool address = 0xadcbe14b994e37edb16fefac6b79e0681a64fdfb
