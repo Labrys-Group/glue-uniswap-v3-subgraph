@@ -19,8 +19,8 @@ import {
   sqrtPriceX96ToTokenPrices,
   STABLE_COINS,
   STABLECOIN_IS_TOKEN0,
-  USDC_WETH_03_POOL,
-  WETH_ADDRESS,
+  USDC_WGLUE_POOL,
+  WGLUE_ADDRESS,
   WHITELIST_TOKENS,
 } from '../../utils/pricing'
 
@@ -30,9 +30,9 @@ export function handleSwap(event: SwapEvent): void {
 
 export function handleSwapHelper(
   event: SwapEvent,
-  stablecoinWrappedNativePoolAddress: string = USDC_WETH_03_POOL,
+  stablecoinWrappedNativePoolAddress: string = USDC_WGLUE_POOL,
   stablecoinIsToken0: boolean = STABLECOIN_IS_TOKEN0,
-  wrappedNativeAddress: string = WETH_ADDRESS,
+  wrappedNativeAddress: string = WGLUE_ADDRESS,
   stablecoinAddresses: string[] = STABLE_COINS,
   minimumEthLocked: BigDecimal = MINIMUM_ETH_LOCKED,
   whitelistTokens: string[] = WHITELIST_TOKENS,

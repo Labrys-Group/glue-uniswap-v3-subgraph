@@ -4,43 +4,34 @@ import { exponentToBigDecimal, safeDiv } from '../utils/index'
 import { Bundle, Pool, Token } from './../types/schema'
 import { ONE_BD, ZERO_BD, ZERO_BI } from './constants'
 
-export const WETH_ADDRESS = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
-export const USDC_WETH_03_POOL = '0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8'
-export const STABLECOIN_IS_TOKEN0 = true
+export const WGLUE_ADDRESS = '0x9a1691d500c54e1d79df2347d170987aa3e527ac' // Wrapped GLUE
+export const USDC_WGLUE_POOL = '0xd8f4a7667fe621d6224d1c426bd15879ca52ee58' // WGLUE/USDC.e pool
+export const STABLECOIN_IS_TOKEN0 = true // We want token1Price from WGLUE/USDC.e pool (treating stablecoin as token0 in function logic)
+
+// Bridge WETH address (stargate)
+export const WETH_ADDRESS = '0x2F6F07CDcf3588944Bf4C42aC74ff24bF56e7590'
+
+// TVLs to track
+const AOL = '0x461Da3759FdB8f0b7b0acA8A0A48A91daAadDf27'
+const HOSICO = '0x8F799534708044e27ec8f834EDCA4e90a81A527d'
+const MIGGLES = '0x258576C5dA4502b0fa91823817C2b69c588d7616'
+const TOSHI = '0x33bAC01fdD0648769F5f941C692621D61D6D31b9'
 
 // token where amounts should contribute to tracked volume and liquidity
 // usually tokens that many tokens are paired with s
 export const WHITELIST_TOKENS: string[] = [
-  WETH_ADDRESS, // WETH
-  '0x6b175474e89094c44da98b954eedeac495271d0f', // DAI
-  '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // USDC
-  '0xdac17f958d2ee523a2206206994597c13d831ec7', // USDT
-  '0x0000000000085d4780b73119b644ae5ecd22b376', // TUSD
-  '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599', // WBTC
-  '0x5d3a536e4d6dbd6114cc1ead35777bab948e3643', // cDAI
-  '0x39aa39c021dfbae8fac545936693ac917d5e7563', // cUSDC
-  '0x86fadb80d8d2cff3c3680819e4da99c10232ba0f', // EBASE
-  '0x57ab1ec28d129707052df4df418d58a2d46d5f51', // sUSD
-  '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2', // MKR
-  '0xc00e94cb662c3520282e6f5717214004a7f26888', // COMP
-  '0x514910771af9ca656af840dff83e8264ecf986ca', // LINK
-  '0xc011a73ee8576fb46f5e1c5751ca3b9fe0af2a6f', // SNX
-  '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e', // YFI
-  '0x111111111117dc0aa78b770fa6a738034120c302', // 1INCH
-  '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8', // yCurv
-  '0x956f47f50a910163d8bf957cf5846d573e7f87ca', // FEI
-  '0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0', // MATIC
-  '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9', // AAVE
-  '0xfe2e637202056d30016725477c5da089ab0a043a', // sETH2
+  WGLUE_ADDRESS, // WGLUE (native wrapped token)
+  WETH_ADDRESS, // WETH (legacy)
+  AOL,
+  HOSICO,
+  MIGGLES,
+  TOSHI,
 ]
 
+// WGLUE/USDC.e pool address = 0xadcbe14b994e37edb16fefac6b79e0681a64fdfb
+
 export const STABLE_COINS: string[] = [
-  '0x6b175474e89094c44da98b954eedeac495271d0f',
-  '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-  '0xdac17f958d2ee523a2206206994597c13d831ec7',
-  '0x0000000000085d4780b73119b644ae5ecd22b376',
-  '0x956f47f50a910163d8bf957cf5846d573e7f87ca',
-  '0x4dd28568d05f09b02220b09c2cb307bfd837cb95',
+  '0xee45ed3f6c675f319bb9de62991c1e78b484e0b8', // stargate USDC.e
 ]
 
 export const MINIMUM_ETH_LOCKED = BigDecimal.fromString('60')
@@ -49,19 +40,25 @@ const Q192 = BigInt.fromI32(2).pow(192 as u8)
 export function sqrtPriceX96ToTokenPrices(sqrtPriceX96: BigInt, token0: Token, token1: Token): BigDecimal[] {
   const num = sqrtPriceX96.times(sqrtPriceX96).toBigDecimal()
   const denom = BigDecimal.fromString(Q192.toString())
-  const price1 = num.div(denom).times(exponentToBigDecimal(token0.decimals)).div(exponentToBigDecimal(token1.decimals))
+  const price1 = num
+    .div(denom)
+    .times(exponentToBigDecimal(token0.decimals))
+    .div(exponentToBigDecimal(token1.decimals))
 
   const price0 = safeDiv(BigDecimal.fromString('1'), price1)
   return [price0, price1]
 }
 
 export function getEthPriceInUSD(
-  stablecoinWrappedNativePoolAddress: string = USDC_WETH_03_POOL,
+  stablecoinWrappedNativePoolAddress: string = USDC_WGLUE_POOL,
   stablecoinIsToken0: boolean = STABLECOIN_IS_TOKEN0, // true is stablecoin is token0, false if stablecoin is token1
 ): BigDecimal {
   const stablecoinWrappedNativePool = Pool.load(stablecoinWrappedNativePoolAddress)
   if (stablecoinWrappedNativePool !== null) {
-    return stablecoinIsToken0 ? stablecoinWrappedNativePool.token0Price : stablecoinWrappedNativePool.token1Price
+    // We want the price of wrapped native token in stablecoin (USD)
+    // If stablecoin is token0: return token1Price (stablecoin per wrapped native)
+    // If stablecoin is token1: return token0Price (stablecoin per wrapped native)
+    return stablecoinIsToken0 ? stablecoinWrappedNativePool.token1Price : stablecoinWrappedNativePool.token0Price
   } else {
     return ZERO_BD
   }
@@ -73,7 +70,7 @@ export function getEthPriceInUSD(
  **/
 export function findEthPerToken(
   token: Token,
-  wrappedNativeAddress: string = WETH_ADDRESS,
+  wrappedNativeAddress: string = WGLUE_ADDRESS,
   stablecoinAddresses: string[] = STABLE_COINS,
   minimumEthLocked: BigDecimal = MINIMUM_ETH_LOCKED,
 ): BigDecimal {
@@ -90,7 +87,13 @@ export function findEthPerToken(
   // hardcoded fix for incorrect rates
   // if whitelist includes token - get the safe price
   if (stablecoinAddresses.includes(token.id)) {
-    priceSoFar = safeDiv(ONE_BD, bundle.ethPriceUSD)
+    if (bundle.ethPriceUSD.gt(ZERO_BD)) {
+      priceSoFar = safeDiv(ONE_BD, bundle.ethPriceUSD)
+    } else {
+      // Bootstrap: if Bundle ethPriceUSD is 0, hardcode USDC.e derivedETH
+      // If 1 GLUE = $0.008, and pool shows 12.22 USDC.e per WGLUE, then 1 USDC.e = 1/12.22 WGLUE
+      priceSoFar = BigDecimal.fromString('0.0818') // ~1/12.22
+    }
   } else {
     for (let i = 0; i < whiteList.length; ++i) {
       const poolAddress = whiteList[i]

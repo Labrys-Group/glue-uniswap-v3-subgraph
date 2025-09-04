@@ -11,9 +11,9 @@ dataSources:
     name: Factory
     network: glue
     source:
-      address: '0xd362339a486E05e4c41C90aD62F309A8Df604eAA'
+      address: '0x6D709dA17b57d608bD13fd6607690cE78745BF47'
       abi: Factory
-      startBlock: 285463
+      startBlock: 40806
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
